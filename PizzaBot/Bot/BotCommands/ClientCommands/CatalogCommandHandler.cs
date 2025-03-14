@@ -28,21 +28,58 @@ namespace PizzaBot.Bot.Commands.ClientCommands
 
         public async Task HandleAsync(Message message)
         {
+            var userId = message.Chat.Id;
             var products = await _dBService.GetAll<Product>();
-            if (products.Count != 0)
-            {
-                string text = "";
-                for (int i = 0; i < products.Count; i++)
-                {
-                    text += $"{i + 1}: {products[i].Name} - {products[i].Price}\n";
-                }
-                await _botClient.SendMessage(chatId: message.Chat.Id, text: text, replyMarkup: Keyboards.GetMainMenu());
-            }
-            else
+
+            if (products.Count == 0)
             {
                 await _botClient.SendMessage(chatId: message.Chat.Id, text: "Каталог пуст", replyMarkup: Keyboards.GetMainMenu());
+                return;
             }
+
+            await _botClient.SendMessage(chatId: message.Chat.Id, text: "\uD83C\uDF7D Каталог товаров:", replyMarkup: Keyboards.GetMainMenu());
+
+            var pizzaProducts = products.Where(x => x.Category == BotConstants.PIZZA_CATEGORY).ToList();
+            var sushiProducts = products.Where(x => x.Category == BotConstants.SUSHI_CATEGORY).ToList();
+            var drinkProducts = products.Where(x => x.Category == BotConstants.DRINKS_CATEGORY).ToList();
+            var dessertProducts = products.Where(x => x.Category == BotConstants.DESSERTS_CATEGORY).ToList();
+
+            if (pizzaProducts.Count != 0)
+            {
+                await PrintCategory(pizzaProducts, userId);
+            }
+            if (sushiProducts.Count != 0)
+            {
+                await PrintCategory(sushiProducts, userId);
+            }
+            if (drinkProducts.Count != 0)
+            {
+                await PrintCategory(drinkProducts, userId);
+            }
+            if (dessertProducts.Count != 0)
+            {
+                await PrintCategory(dessertProducts, userId);
+            }
+
             _logger.Information("{0} checked catalog", message?.From?.Username);
+        }
+
+        private async Task PrintCategory(List<Product> products, long userId)
+        {
+            string emoji = products[0].Category switch
+            {
+                BotConstants.PIZZA_CATEGORY => "\uD83C\uDF55",
+                BotConstants.SUSHI_CATEGORY => "\uD83C\uDF63",
+                BotConstants.DRINKS_CATEGORY => "\U0001F964",
+                BotConstants.DESSERTS_CATEGORY => "\uD83C\uDF70",
+                _ => string.Empty
+            };
+            string text = $"{emoji} {products[0].Category}:\n\n";
+            foreach (var product in products)
+            {
+                text += $"{product.Name} ({product.Weight}г) \u2014 {product.Price}\u20BD\n    {product.Description}\n\n";
+            }
+            await _botClient.SendMessage(chatId: userId, text: text, replyMarkup: Keyboards.GetMainMenu());
         }
     }
 }

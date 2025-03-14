@@ -19,6 +19,11 @@ namespace PizzaBot.Services
 
         public async Task<T?> GetById<T>(long id) where T : class
         {
+            if (typeof(T) != typeof(User))
+            {
+                var newId = Convert.ToInt32(id);
+                return await db.Set<T>().FindAsync(newId);
+            }
             return await db.Set<T>().FindAsync(id);
         }
 

@@ -27,9 +27,16 @@ namespace PizzaBot.Bot.BotService
 
     public enum UserState
     {
-        Ordering,
+        EnteringProducts,
+        EnteringAddress,
+        ConfirmingOrder,
+        ProcessingOrder,
+        TakingOrder,
         AddingIngridientsToWarehouse,
         AddingProduct,
-        AddingIngridientsForProduct
+        DeletingProduct,
+        AddingIngridientsForProduct,
+        EnteringBaseDeliveryCost,
+        EnteringDeliveryCostPerKilometer
     }
 }

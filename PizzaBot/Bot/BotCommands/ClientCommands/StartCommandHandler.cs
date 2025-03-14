@@ -13,6 +13,7 @@ namespace PizzaBot.Bot.Commands.ClientCommands
         private readonly ITelegramBotClient _botClient;
         private readonly UserStateMachine _stateMachine;
         private readonly DBService _dBService;
+        private readonly MapApiService _mapApiService;
         private readonly ILogger _logger;
 
         public StartCommandHandler(ITelegramBotClient botClient, UserStateMachine stateMachine, DBService dbService, ILogger logger)
@@ -30,7 +31,7 @@ namespace PizzaBot.Bot.Commands.ClientCommands
             var user = await _dBService.GetById<Models.User>(message.Chat.Id);
             if (user == null)
             {
-                await _botClient.SendMessage(chatId: message.Chat.Id, text: "Рады видеть Вас, новый пользователь! Выберите действие:", replyMarkup: Keyboards.GetMainMenu());
+                await _botClient.SendMessage(chatId: message.Chat.Id, text: $"Рады видеть Вас, новый пользователь! Выберите команду из нижней панели или введите {CommandConstants.HELP_COMMAND} для получения полной информации.", replyMarkup: Keyboards.GetMainMenu());
                 await _dBService.Create(new Models.User
                 {
                     Id = message.Chat.Id,
@@ -40,7 +41,7 @@ namespace PizzaBot.Bot.Commands.ClientCommands
             }
             else
             {
-                await _botClient.SendMessage(chatId: message.Chat.Id, text: "Рады снова видеть вас! Выберите действие:", replyMarkup: Keyboards.GetMainMenu());
+                await _botClient.SendMessage(chatId: message.Chat.Id, text: $"Выберите команду из нижней панели или введите {CommandConstants.HELP_COMMAND} для получения полной информации.", replyMarkup: Keyboards.GetMainMenu());
                 _logger.Information("{0} has entered the /start command", message?.From?.Username);
             }
         }

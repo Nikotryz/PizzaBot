@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace PizzaBot.Models;
+﻿namespace PizzaBot.Models;
 
 public partial class OrderProduct
 {
